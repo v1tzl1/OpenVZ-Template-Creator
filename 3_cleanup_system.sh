@@ -12,9 +12,9 @@ dialog --no-cancel --inputbox "Where is the new system? (default /mnt/dice)" 8 5
 	input_path=`cat /tmp/input_path.tmp`
 
 dialog --no-cancel --menu  "Which distribution want you cleanup?" 10 40 3 \
-	"Debian" "."  \
-	"Ubuntu" "."  \
-	"Gentoo" "." 2>/tmp/input_distri.tmp
+	Debian "Debian"  \
+	Ubuntu "Ubuntu"  \
+	Gentoo "Gentoo" 2>/tmp/input_distri.tmp
 	input_distri=`cat /tmp/input_distri.tmp`
 
 dialog --no-cancel --inputbox \
@@ -32,7 +32,7 @@ rm -f $input_path/etc/ssh/ssh_host_*
 rm -f $input_path/etc/ssh/moduli
 
 case "$input_distri" in
-	debian|ubuntu)
+	Debian|Ubuntu)
 		# Each individual VE should have its own pair of SSH host keys.
 		# The code below will wipe out the existing SSH keys and instruct the newly-created VE to create new SSH keys on first boot.
 cat << EOF > ${input_path}/etc/rc2.d/S15ssh_gen_host_keys
@@ -50,7 +50,7 @@ EOF
 		> dpkg.log; > syslog; > daemon.log; > apt/term.log; > faillog; > lastlog; > wtmp 
 		rm -f $input_path/var/log/*.0 $input_path/var/log/*.1
 		;; #END debian|ubuntu
-	gentoo)
+	Gentoo)
 		cd $input_path/var/log/
 		> lastlog; > faillog; > wtmp
 		> auth.log; > cron.log; > daemon.log; > debug; > dmesg; > mail.log; > messages; > syslog; > user.log
@@ -68,5 +68,6 @@ EOF
 		;; esac #END gentoo
 
 cd $input_path
+dialog --infobox "Creating Template..." 0 0
 tar --numeric-owner -zcf ~/${input_template_name}.tar.gz . 2>/dev/null
 dialog --no-cancel --msgbox "$input_template_name.tar.gz \ saved under ~/" 5 42
